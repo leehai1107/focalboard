@@ -68,4 +68,9 @@
         flex-wrap: nowrap;
         overflow: hidden !important;
     }
+
+    .Editable.strikethrough {
+        text-decoration: line-through;
+        opacity: 0.6;
+    }
 }

@@ -65,6 +65,10 @@ type Card struct {
 	// required: false
 	Icon string `json:"icon"`
 
+	// The color of the card
+	// required: false
+	Color string `json:"color"`
+
 	// True if this card belongs to a template
 	// required: false
 	IsTemplate bool `json:"isTemplate"`
@@ -152,6 +156,10 @@ type CardPatch struct {
 	// required: false
 	Icon *string `json:"icon"`
 
+	// The color of the card
+	// required: false
+	Color *string `json:"color"`
+
 	// A map of property ids to property option ids to be updated
 	// required: false
 	UpdatedProperties map[string]any `json:"updatedProperties"`
@@ -169,6 +177,10 @@ func (p *CardPatch) Patch(card *Card) *Card {
 
 	if p.Icon != nil {
 		card.Icon = *p.Icon
+	}
+
+	if p.Color != nil {
+		card.Color = *p.Color
 	}
 
 	if card.Properties == nil {
@@ -225,6 +237,7 @@ func Block2Card(block *Block) (*Card, error) {
 
 	contentOrder := make([]string, 0)
 	icon := ""
+	color := ""
 	isTemplate := false
 	properties := make(map[string]any)
 
@@ -250,6 +263,14 @@ func Block2Card(block *Block) (*Card, error) {
 			icon = id
 		} else {
 			return nil, ErrInvalidFieldType{"icon"}
+		}
+	}
+
+	if colorAny, ok := block.Fields["color"]; ok {
+		if c, ok := colorAny.(string); ok {
+			color = c
+		} else {
+			return nil, ErrInvalidFieldType{"color"}
 		}
 	}
 
@@ -279,6 +300,7 @@ func Block2Card(block *Block) (*Card, error) {
 		Title:        block.Title,
 		ContentOrder: contentOrder,
 		Icon:         icon,
+		Color:        color,
 		IsTemplate:   isTemplate,
 		Properties:   properties,
 		CreateAt:     block.CreateAt,
@@ -306,6 +328,9 @@ func CardPatch2BlockPatch(cardPatch *CardPatch) (*BlockPatch, error) {
 	}
 	if cardPatch.Icon != nil {
 		updatedFields["icon"] = cardPatch.Icon
+	}
+	if cardPatch.Color != nil {
+		updatedFields["color"] = cardPatch.Color
 	}
 
 	properties := make(map[string]any)

@@ -310,6 +310,19 @@ class Mutator {
         )
     }
 
+    async changeCardColor(boardId: string, cardId: string, oldColor: string|undefined, color: string, description = 'change card color') {
+        await undoManager.perform(
+            async () => {
+                await octoClient.patchBlock(boardId, cardId, {updatedFields: {color}})
+            },
+            async () => {
+                await octoClient.patchBlock(boardId, cardId, {updatedFields: {color: oldColor}})
+            },
+            description,
+            this.undoGroupId,
+        )
+    }
+
     async changeBoardDescription(boardId: string, blockId: string, oldBlockDescription: string|undefined, blockDescription: string, description = 'change description') {
         await undoManager.perform(
             async () => {

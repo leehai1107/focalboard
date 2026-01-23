@@ -16,6 +16,11 @@
 
     transition: background 100ms ease-out 0s;
 
+    &.has-card-color {
+        border-left: 4px solid var(--card-color);
+        padding-left: 12px;
+    }
+
     &:hover {
         background-color: rgba(var(--center-channel-color-rgb), 0.08);
 
@@ -79,6 +84,11 @@
             max-height: 100px;
             -webkit-line-clamp: 5;
             -webkit-box-orient: vertical; // stylelint-disable-line
+
+            &.strikethrough {
+                text-decoration: line-through;
+                opacity: 0.6;
+            }
         }
     }
 }

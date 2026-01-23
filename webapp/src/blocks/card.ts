@@ -5,6 +5,7 @@ import {Block, createBlock} from './block'
 
 type CardFields = {
     icon?: string
+    color?: string
     isTemplate?: boolean
     properties: Record<string, string | string[]>
     contentOrder: Array<string | string[]>
@@ -32,6 +33,7 @@ function createCard(block?: Block): Card {
         type: 'card',
         fields: {
             icon: block?.fields.icon || '',
+            color: block?.fields.color || '',
             properties: {...(block?.fields.properties || {})},
             contentOrder,
             isTemplate: block?.fields.isTemplate || false,

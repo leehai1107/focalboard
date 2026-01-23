@@ -42,6 +42,21 @@ const KanbanCard = (props: Props) => {
     if (props.isManualSort && isOver) {
         className += ' dragover'
     }
+    
+    // Check if card has color
+    const cardColor = card.fields.color
+    if (cardColor) {
+        className += ' has-card-color'
+    }
+
+    // Check if any strikethrough property is checked
+    const hasStrikethroughChecked = useMemo(() => {
+        const strikethroughTemplates = board.cardProperties.filter((t) => t.type === 'strikethrough')
+        return strikethroughTemplates.some((template) => {
+            const value = card.fields.properties[template.id]
+            return Boolean(value)
+        })
+    }, [board.cardProperties, card.fields.properties])
 
     const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false)
     const handleDeleteCard = useCallback(() => {
@@ -87,7 +102,10 @@ const KanbanCard = (props: Props) => {
                 ref={props.readonly ? () => null : cardRef}
                 className={`${className}`}
                 draggable={!props.readonly}
-                style={{opacity: isDragging ? 0.5 : 1}}
+                style={{
+                    opacity: isDragging ? 0.5 : 1,
+                    ['--card-color' as string]: cardColor || 'transparent',
+                }}
                 onClick={handleOnClick}
             >
                 {!props.readonly &&
@@ -125,7 +143,7 @@ const KanbanCard = (props: Props) => {
                     { card.fields.icon ? <div className='octo-icon'>{card.fields.icon}</div> : undefined }
                     <div
                         key='__title'
-                        className='octo-titletext'
+                        className={`octo-titletext${hasStrikethroughChecked ? ' strikethrough' : ''}`}
                     >
                         {card.title || intl.formatMessage({id: 'KanbanCard.untitled', defaultMessage: 'Untitled'})}
                     </div>

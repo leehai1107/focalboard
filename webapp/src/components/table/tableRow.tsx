@@ -56,6 +56,15 @@ const TableRow = (props: Props) => {
     const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false)
     const columnResize = useColumnResize()
 
+    // Check if any strikethrough property is checked
+    const hasStrikethroughChecked = useMemo(() => {
+        const strikethroughTemplates = board.cardProperties.filter((t) => t.type === 'strikethrough')
+        return strikethroughTemplates.some((template) => {
+            const value = card.fields.properties[template.id]
+            return Boolean(value)
+        })
+    }, [board.cardProperties, card.fields.properties])
+
     useEffect(() => {
         if (props.focusOnMount) {
             setTimeout(() => titleRef.current?.focus(), 10)
@@ -145,12 +154,18 @@ const TableRow = (props: Props) => {
         setShowConfirmationDialogBox(true)
     }, [card.title, card.fields.contentOrder, handleDeleteCard])
 
+    // Check if card has color for styling
+    const cardColor = card.fields.color
+
     return (
         <div
             className={className}
             onClick={onClick}
             ref={cardRef}
-            style={{opacity: isDragging ? 0.5 : 1}}
+            style={{
+                opacity: isDragging ? 0.5 : 1,
+                borderLeft: cardColor ? `4px solid ${cardColor}` : undefined,
+            }}
         >
 
             <div className='action-cell octo-table-cell-btn'>
@@ -177,6 +192,7 @@ const TableRow = (props: Props) => {
                         onCancel={() => setTitle(card.title || '')}
                         readonly={props.readonly}
                         spellCheck={true}
+                        className={hasStrikethroughChecked ? 'strikethrough' : ''}
                     />
                 </div>
 

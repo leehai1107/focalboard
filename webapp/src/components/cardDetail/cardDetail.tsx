@@ -39,6 +39,7 @@ import {CardDetailProvider} from './cardDetailContext'
 import CardDetailContents from './cardDetailContents'
 import CardDetailContentsMenu from './cardDetailContentsMenu'
 import CardDetailProperties from './cardDetailProperties'
+import CardColorSelector from './cardColorSelector'
 import useImagePaste from './imagePaste'
 import AttachmentList from './attachment'
 
@@ -287,6 +288,14 @@ const CardDetail = (props: Props): JSX.Element|null => {
                     cards={props.cards}
                     activeView={props.activeView}
                     views={props.views}
+                    readonly={props.readonly}
+                />}
+
+                {/* Card Color Selector */}
+                {!limited &&
+                <CardColorSelector
+                    card={props.card}
+                    board={props.board}
                     readonly={props.readonly}
                 />}
 
