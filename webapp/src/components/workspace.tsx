@@ -160,6 +160,9 @@ const Workspace = (props: Props) => {
     const board = useAppSelector(getCurrentBoard)
 
     const viewId = useAppSelector(getCurrentViewId)
+    const views = useAppSelector(getCurrentBoardViews)
+    const history = useHistory()
+    const match = useRouteMatch<{boardId: string, viewId: string, cardId?: string}>()
     const [boardTemplateSelectorOpen, setBoardTemplateSelectorOpen] = useState(false)
 
     const closeBoardTemplateSelector = useCallback(() => {
@@ -170,6 +173,15 @@ const Workspace = (props: Props) => {
             setBoardTemplateSelectorOpen(true)
         }
     }, [board])
+
+    const handleViewClick = useCallback((viewId: string) => {
+        if (board) {
+            const params = {...match.params, viewId}
+            const newPath = generatePath(Utils.getBoardPagePath(match.path), params)
+            history.push(newPath)
+        }
+    }, [board, match, history])
+
     useEffect(() => {
         setBoardTemplateSelectorOpen(false)
     }, [board, viewId])

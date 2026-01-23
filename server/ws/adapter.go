@@ -22,6 +22,10 @@ const (
 	websocketActionUpdateCardLimitTimestamp = "UPDATE_CARD_LIMIT_TIMESTAMP"
 	websocketActionReorderCategories        = "REORDER_CATEGORIES"
 	websocketActionReorderCategoryBoards    = "REORDER_CATEGORY_BOARDS"
+	websocketActionUpdateViewCategory       = "UPDATE_VIEW_CATEGORY"
+	websocketActionUpdateViewCategoryView   = "UPDATE_VIEW_CATEGORY_VIEW"
+	websocketActionReorderViewCategories    = "REORDER_VIEW_CATEGORIES"
+	websocketActionReorderViewCategoryViews = "REORDER_VIEW_CATEGORY_VIEWS"
 )
 
 type Store interface {
@@ -43,4 +47,8 @@ type Adapter interface {
 	BroadcastSubscriptionChange(teamID string, subscription *model.Subscription)
 	BroadcastCategoryReorder(teamID, userID string, categoryOrder []string)
 	BroadcastCategoryBoardsReorder(teamID, userID, categoryID string, boardsOrder []string)
+	BroadcastViewCategoryChange(teamID string, category *model.ViewCategory)
+	BroadcastViewCategoryReorder(teamID, userID, boardID string, categoryOrder []string)
+	BroadcastViewCategoryViewUpdate(teamID, userID, categoryID, viewID string, hidden bool)
+	BroadcastViewCategoryViewsReorder(teamID, categoryID string, viewOrder []string)
 }

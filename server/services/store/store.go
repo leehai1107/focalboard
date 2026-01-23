@@ -128,6 +128,20 @@ type Store interface {
 
 	GetUserCategoryBoards(userID, teamID string) ([]model.CategoryBoards, error)
 
+	GetViewCategory(id string) (*model.ViewCategory, error)
+	GetUserViewCategories(userID, boardID string) ([]model.ViewCategory, error)
+	// @withTransaction
+	CreateViewCategory(viewCategory model.ViewCategory) error
+	UpdateViewCategory(viewCategory model.ViewCategory) error
+	DeleteViewCategory(categoryID, userID, boardID string) error
+	ReorderViewCategories(userID, boardID string, newCategoryOrder []string) ([]string, error)
+
+	GetUserViewCategoryViews(userID, boardID string) ([]model.ViewCategoryViews, error)
+	// @withTransaction
+	AddUpdateViewCategoryView(userID, categoryID string, viewIDs []string) error
+	ReorderViewCategoryViews(categoryID string, newViewsOrder []string) ([]string, error)
+	SetViewVisibility(userID, categoryID, viewID string, visible bool) error
+
 	GetFileInfo(id string) (*mmModel.FileInfo, error)
 	SaveFileInfo(fileInfo *mmModel.FileInfo) error
 

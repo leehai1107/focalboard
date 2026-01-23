@@ -277,6 +277,10 @@ const Sidebar = (props: Props) => {
             handleCategoryDND(result)
         } else if (type === 'board') {
             handleCategoryBoardDND(result)
+        } else if (type === 'view-category') {
+            handleViewCategoryDND(result)
+        } else if (type === 'view') {
+            handleViewDND(result)
         } else {
             Utils.logWarn(`unknown drag type encountered, type: ${type}`)
         }
@@ -284,6 +288,18 @@ const Sidebar = (props: Props) => {
         setDraggedItemID('')
         setIsCategoryBeingDragged(false)
     }, [team, sidebarCategories])
+
+    const handleViewCategoryDND = useCallback(async (result: DropResult) => {
+        // View category reordering within a board
+        // To be implemented with actual API calls
+        // For now, this is a placeholder
+    }, [team])
+
+    const handleViewDND = useCallback(async (result: DropResult) => {
+        // View reordering or moving between view categories
+        // To be implemented with actual API calls
+        // For now, this is a placeholder
+    }, [team])
 
     const [draggedItemID, setDraggedItemID] = useState<string>('')
     const [isCategoryBeingDragged, setIsCategoryBeingDragged] = useState<boolean>(false)

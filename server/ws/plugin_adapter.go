@@ -673,3 +673,103 @@ func (pa *PluginAdapter) BroadcastCardLimitTimestampChange(cardLimitTimestamp in
 
 	pa.sendMessageToAll(websocketActionUpdateCardLimitTimestamp, utils.StructToMap(message))
 }
+
+func (pa *PluginAdapter) BroadcastViewCategoryChange(teamID string, category *model.ViewCategory) {
+	pa.logger.Debug("BroadcastViewCategoryChange",
+		mlog.String("userID", category.UserID),
+		mlog.String("teamID", teamID),
+		mlog.String("boardID", category.BoardID),
+		mlog.String("viewCategoryID", category.ID),
+	)
+
+	message := UpdateViewCategoryMessage{
+		Action:       websocketActionUpdateViewCategory,
+		TeamID:       teamID,
+		ViewCategory: category,
+	}
+
+	payload := utils.StructToMap(message)
+
+	go func() {
+		clusterMessage := &ClusterMessage{
+			Payload: payload,
+			UserID:  category.UserID,
+		}
+
+		pa.sendMessageToCluster(clusterMessage)
+	}()
+
+	pa.sendUserMessageSkipCluster(websocketActionUpdateViewCategory, payload, category.UserID)
+}
+
+func (pa *PluginAdapter) BroadcastViewCategoryReorder(teamID, userID, boardID string, categoryOrder []string) {
+	pa.logger.Debug("BroadcastViewCategoryReorder",
+		mlog.String("userID", userID),
+		mlog.String("teamID", teamID),
+		mlog.String("boardID", boardID),
+	)
+
+	message := ViewCategoryReorderMessage{
+		Action:        websocketActionReorderViewCategories,
+		CategoryOrder: categoryOrder,
+		TeamID:        teamID,
+		BoardID:       boardID,
+	}
+	payload := utils.StructToMap(message)
+	go func() {
+		clusterMessage := &ClusterMessage{
+			Payload: payload,
+			UserID:  userID,
+		}
+
+		pa.sendMessageToCluster(clusterMessage)
+	}()
+
+	pa.sendUserMessageSkipCluster(message.Action, payload, userID)
+}
+
+func (pa *PluginAdapter) BroadcastViewCategoryViewUpdate(teamID, userID, categoryID, viewID string, hidden bool) {
+	pa.logger.Debug("BroadcastViewCategoryViewUpdate",
+		mlog.String("userID", userID),
+		mlog.String("teamID", teamID),
+		mlog.String("categoryID", categoryID),
+		mlog.String("viewID", viewID),
+		mlog.Bool("hidden", hidden),
+	)
+
+	message := ViewCategoryViewUpdateMessage{
+		Action:     websocketActionUpdateViewCategoryView,
+		TeamID:     teamID,
+		CategoryID: categoryID,
+		ViewID:     viewID,
+		Hidden:     hidden,
+	}
+	payload := utils.StructToMap(message)
+
+	go func() {
+		clusterMessage := &ClusterMessage{
+			Payload: payload,
+			UserID:  userID,
+		}
+
+		pa.sendMessageToCluster(clusterMessage)
+	}()
+
+	pa.sendUserMessageSkipCluster(message.Action, payload, userID)
+}
+
+func (pa *PluginAdapter) BroadcastViewCategoryViewsReorder(teamID, categoryID string, viewOrder []string) {
+	pa.logger.Debug("BroadcastViewCategoryViewsReorder",
+		mlog.String("teamID", teamID),
+		mlog.String("categoryID", categoryID),
+	)
+
+	message := ViewCategoryViewsReorderMessage{
+		Action:     websocketActionReorderViewCategoryViews,
+		CategoryID: categoryID,
+		ViewOrder:  viewOrder,
+		TeamID:     teamID,
+	}
+
+	pa.sendTeamMessage(message.Action, teamID, utils.StructToMap(message))
+}
