@@ -19,6 +19,7 @@ func (a *API) registerViewCategoriesRoutes(r *mux.Router) {
 	r.HandleFunc("/boards/{boardID}/view-categories", a.sessionRequired(a.handleGetUserViewCategoryViews)).Methods(http.MethodGet)
 	r.HandleFunc("/boards/{boardID}/view-categories/{categoryID}/views/reorder", a.sessionRequired(a.handleReorderViewCategoryViews)).Methods(http.MethodPut)
 	r.HandleFunc("/boards/{boardID}/view-categories/{categoryID}/views/{viewID}", a.sessionRequired(a.handleUpdateViewCategoryView)).Methods(http.MethodPost)
+	r.HandleFunc("/boards/{boardID}/views/{viewID}/uncategorize", a.sessionRequired(a.handleUncategorizeView)).Methods(http.MethodPost)
 	r.HandleFunc("/boards/{boardID}/view-categories/{categoryID}/views/{viewID}/hide", a.sessionRequired(a.handleHideView)).Methods(http.MethodPut)
 	r.HandleFunc("/boards/{boardID}/view-categories/{categoryID}/views/{viewID}/unhide", a.sessionRequired(a.handleUnhideView)).Methods(http.MethodPut)
 }
@@ -812,6 +813,70 @@ func (a *API) handleUnhideView(w http.ResponseWriter, r *http.Request) {
 
 	// send websocket message about view category change
 	a.app.BroadcastViewCategoryViewUpdate(board.TeamID, userID, categoryID, viewID, false)
+
+	jsonStringResponse(w, http.StatusOK, "{}")
+	auditRec.Success()
+}
+
+func (a *API) handleUncategorizeView(w http.ResponseWriter, r *http.Request) {
+	// swagger:operation POST /boards/{boardID}/views/{viewID}/uncategorize uncategorizeView
+	//
+	// Remove a view from its category (move to uncategorized)
+	//
+	// ---
+	// produces:
+	// - application/json
+	// parameters:
+	// - name: boardID
+	//   in: path
+	//   description: Board ID
+	//   required: true
+	//   type: string
+	// - name: viewID
+	//   in: path
+	//   description: View ID
+	//   required: true
+	//   type: string
+	// security:
+	// - BearerAuth: []
+	// responses:
+	//   '200':
+	//     description: success
+	//   default:
+	//     description: internal error
+	//     schema:
+	//       "$ref": "#/definitions/ErrorResponse"
+
+	ctx := r.Context()
+	session := ctx.Value(sessionContextKey).(*model.Session)
+	userID := session.UserID
+
+	vars := mux.Vars(r)
+	boardID := vars["boardID"]
+	viewID := vars["viewID"]
+
+	auditRec := a.makeAuditRecord(r, "uncategorizeView", audit.Fail)
+	defer a.audit.LogRecord(audit.LevelModify, auditRec)
+	auditRec.AddMeta("boardID", boardID)
+	auditRec.AddMeta("viewID", viewID)
+
+	_, err := a.app.GetBoard(boardID)
+	if err != nil {
+		a.errorResponse(w, r, err)
+		return
+	}
+
+	if !a.permissions.HasPermissionToBoard(session.UserID, boardID, model.PermissionViewBoard) {
+		a.errorResponse(w, r, model.NewErrPermission("access denied to board"))
+		return
+	}
+
+	// Move to uncategorized by setting category_id to empty string
+	err = a.app.AddUpdateViewCategoryView(userID, "", []string{viewID})
+	if err != nil {
+		a.errorResponse(w, r, err)
+		return
+	}
 
 	jsonStringResponse(w, http.StatusOK, "{}")
 	auditRec.Success()

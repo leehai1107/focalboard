@@ -242,5 +242,28 @@
                 padding: 0;
             }
         }
+
+        .octo-sidebar-title {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .octo-sidebar-title-input {
+            background: rgba(var(--sidebar-text-rgb), 0.08);
+            border: 1px solid rgba(var(--sidebar-text-rgb), 0.16);
+            border-radius: 3px;
+            color: rgb(var(--sidebar-text-rgb));
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 6px;
+            outline: none;
+            flex: 1;
+            min-width: 0;
+
+            &:focus {
+                border-color: rgba(var(--sidebar-text-rgb), 0.4);
+                background: rgba(var(--sidebar-text-rgb), 0.12);
+            }
+        }
     }
 }

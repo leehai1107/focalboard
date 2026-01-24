@@ -1167,6 +1167,17 @@ class OctoClient {
         })
     }
 
+    async uncategorizeView(boardID: string, viewID: string): Promise<Response> {
+        const url = `/api/v2/boards/${boardID}/views/${viewID}/uncategorize`
+        const body = JSON.stringify({})
+
+        return fetch(this.getBaseURL() + url, {
+            method: 'POST',
+            headers: this.headers(),
+            body,
+        })
+    }
+
     async hideView(boardID: string, categoryID: string, viewID: string): Promise<Response> {
         const path = `/api/v2/boards/${boardID}/view-categories/${categoryID}/views/${viewID}/hide`
         return fetch(this.getBaseURL() + path, {
