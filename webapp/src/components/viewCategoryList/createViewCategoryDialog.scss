@@ -1,0 +1,83 @@
+// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
+// See LICENSE.txt for license information.
+
+.CreateViewCategoryDialog {
+    .Dialog {
+        max-width: 400px;
+    }
+
+    .dialog-content {
+        padding: 20px;
+
+        .input-container {
+            margin-bottom: 16px;
+
+            label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 600;
+                font-size: 14px;
+                color: rgb(var(--center-channel-color-rgb));
+            }
+
+            input {
+                width: 100%;
+                padding: 8px 12px;
+                border: 1px solid rgba(var(--center-channel-color-rgb), 0.16);
+                border-radius: 4px;
+                font-size: 14px;
+                background-color: rgb(var(--center-channel-bg-rgb));
+                color: rgb(var(--center-channel-color-rgb));
+                outline: none;
+
+                &:focus {
+                    border-color: var(--button-bg);
+                }
+
+                &::placeholder {
+                    color: rgba(var(--center-channel-color-rgb), 0.56);
+                }
+            }
+        }
+
+        .dialog-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 20px;
+
+            button {
+                padding: 8px 16px;
+                border-radius: 4px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                border: none;
+                outline: none;
+
+                &.cancel-button {
+                    background-color: transparent;
+                    color: var(--button-bg);
+
+                    &:hover {
+                        background-color: rgba(var(--button-bg-rgb), 0.08);
+                    }
+                }
+
+                &.create-button {
+                    background-color: var(--button-bg);
+                    color: var(--button-color);
+
+                    &:hover {
+                        background-color: rgba(var(--button-bg-rgb), 0.88);
+                    }
+
+                    &:disabled {
+                        opacity: 0.5;
+                        cursor: not-allowed;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -789,3 +789,101 @@ func (ws *Server) BroadcastSubscriptionChange(workspaceID string, subscription *
 func (ws *Server) BroadcastCardLimitTimestampChange(cardLimitTimestamp int64) {
 	// not implemented for standalone server.
 }
+
+func (ws *Server) BroadcastViewCategoryChange(teamID string, category *model.ViewCategory) {
+	message := UpdateViewCategoryMessage{
+		Action:       websocketActionUpdateViewCategory,
+		TeamID:       teamID,
+		ViewCategory: category,
+	}
+
+	listener := ws.getListenerForUser(teamID, category.UserID)
+	if listener != nil {
+		ws.logger.Debug("Broadcast view category change",
+			mlog.String("userID", category.UserID),
+			mlog.String("teamID", teamID),
+			mlog.String("boardID", category.BoardID),
+			mlog.String("viewCategoryID", category.ID),
+			mlog.Stringer("remoteAddr", listener.conn.RemoteAddr()),
+		)
+
+		if err := listener.WriteJSON(message); err != nil {
+			ws.logger.Error("broadcast view category change error", mlog.Err(err))
+			listener.conn.Close()
+		}
+	}
+}
+
+func (ws *Server) BroadcastViewCategoryReorder(teamID, userID, boardID string, categoryOrder []string) {
+	message := ViewCategoryReorderMessage{
+		Action:        websocketActionReorderViewCategories,
+		CategoryOrder: categoryOrder,
+		TeamID:        teamID,
+		BoardID:       boardID,
+	}
+
+	listener := ws.getListenerForUser(teamID, userID)
+	if listener != nil {
+		ws.logger.Debug("Broadcast view category order change",
+			mlog.String("userID", userID),
+			mlog.String("teamID", teamID),
+			mlog.String("boardID", boardID),
+			mlog.Stringer("remoteAddr", listener.conn.RemoteAddr()),
+		)
+
+		if err := listener.WriteJSON(message); err != nil {
+			ws.logger.Error("broadcast view category order change error", mlog.Err(err))
+			listener.conn.Close()
+		}
+	}
+}
+
+func (ws *Server) BroadcastViewCategoryViewUpdate(teamID, userID, categoryID, viewID string, hidden bool) {
+	message := ViewCategoryViewUpdateMessage{
+		Action:     websocketActionUpdateViewCategoryView,
+		TeamID:     teamID,
+		CategoryID: categoryID,
+		ViewID:     viewID,
+		Hidden:     hidden,
+	}
+
+	listener := ws.getListenerForUser(teamID, userID)
+	if listener != nil {
+		ws.logger.Debug("Broadcast view category view update",
+			mlog.String("userID", userID),
+			mlog.String("teamID", teamID),
+			mlog.String("categoryID", categoryID),
+			mlog.String("viewID", viewID),
+			mlog.Stringer("remoteAddr", listener.conn.RemoteAddr()),
+		)
+
+		if err := listener.WriteJSON(message); err != nil {
+			ws.logger.Error("broadcast view category view update error", mlog.Err(err))
+			listener.conn.Close()
+		}
+	}
+}
+
+func (ws *Server) BroadcastViewCategoryViewsReorder(teamID, categoryID string, viewOrder []string) {
+	message := ViewCategoryViewsReorderMessage{
+		Action:     websocketActionReorderViewCategoryViews,
+		CategoryID: categoryID,
+		ViewOrder:  viewOrder,
+		TeamID:     teamID,
+	}
+
+	// Broadcast to all listeners in the team since views affect the board UI
+	listeners := ws.listenersByTeam[teamID]
+	for _, listener := range listeners {
+		ws.logger.Debug("Broadcast view category views order change",
+			mlog.String("teamID", teamID),
+			mlog.String("categoryID", categoryID),
+			mlog.Stringer("remoteAddr", listener.conn.RemoteAddr()),
+		)
+
+		if err := listener.WriteJSON(message); err != nil {
+			ws.logger.Error("broadcast view category views order change error", mlog.Err(err))
+			listener.conn.Close()
+		}
+	}
+}

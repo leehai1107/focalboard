@@ -428,6 +428,94 @@ func (s *SQLStore) GetCategory(id string) (*model.Category, error) {
 
 }
 
+func (s *SQLStore) GetViewCategory(id string) (*model.ViewCategory, error) {
+	return s.getViewCategory(s.db, id)
+
+}
+
+func (s *SQLStore) GetUserViewCategories(userID string, boardID string) ([]model.ViewCategory, error) {
+	return s.getUserViewCategories(s.db, userID, boardID)
+
+}
+
+func (s *SQLStore) CreateViewCategory(viewCategory model.ViewCategory) error {
+	if s.dbType == model.SqliteDBType {
+		return s.createViewCategory(s.db, viewCategory)
+	}
+	tx, txErr := s.db.BeginTx(context.Background(), nil)
+	if txErr != nil {
+		return txErr
+	}
+	err := s.createViewCategory(tx, viewCategory)
+	if err != nil {
+		if rollbackErr := tx.Rollback(); rollbackErr != nil {
+			s.logger.Error("transaction rollback error", mlog.Err(rollbackErr), mlog.String("methodName", "CreateViewCategory"))
+		}
+		return err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+
+	return nil
+
+}
+
+func (s *SQLStore) UpdateViewCategory(viewCategory model.ViewCategory) error {
+	return s.updateViewCategory(s.db, viewCategory)
+
+}
+
+func (s *SQLStore) DeleteViewCategory(categoryID string, userID string, boardID string) error {
+	return s.deleteViewCategory(s.db, categoryID, userID, boardID)
+
+}
+
+func (s *SQLStore) ReorderViewCategories(userID string, boardID string, newCategoryOrder []string) ([]string, error) {
+	return s.reorderViewCategories(s.db, userID, boardID, newCategoryOrder)
+
+}
+
+func (s *SQLStore) GetUserViewCategoryViews(userID string, boardID string) ([]model.ViewCategoryViews, error) {
+	return s.getUserViewCategoryViews(s.db, userID, boardID)
+
+}
+
+func (s *SQLStore) AddUpdateViewCategoryView(userID string, categoryID string, viewIDs []string) error {
+	if s.dbType == model.SqliteDBType {
+		return s.addUpdateViewCategoryView(s.db, userID, categoryID, viewIDs)
+	}
+	tx, txErr := s.db.BeginTx(context.Background(), nil)
+	if txErr != nil {
+		return txErr
+	}
+	err := s.addUpdateViewCategoryView(tx, userID, categoryID, viewIDs)
+	if err != nil {
+		if rollbackErr := tx.Rollback(); rollbackErr != nil {
+			s.logger.Error("transaction rollback error", mlog.Err(rollbackErr), mlog.String("methodName", "AddUpdateViewCategoryView"))
+		}
+		return err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+
+	return nil
+
+}
+
+func (s *SQLStore) ReorderViewCategoryViews(categoryID string, newViewsOrder []string) ([]string, error) {
+	return s.reorderViewCategoryViews(s.db, categoryID, newViewsOrder)
+
+}
+
+func (s *SQLStore) SetViewVisibility(userID string, categoryID string, viewID string, visible bool) error {
+	return s.setViewVisibility(s.db, userID, categoryID, viewID, visible)
+
+}
+
 func (s *SQLStore) GetChannel(teamID string, channelID string) (*mmModel.Channel, error) {
 	return s.getChannel(s.db, teamID, channelID)
 

@@ -9,6 +9,7 @@ import {Utils} from './utils'
 import {ClientConfig} from './config/clientConfig'
 import {UserSettings} from './userSettings'
 import {Category, CategoryBoards} from './store/sidebar'
+import {ViewCategory, ViewCategoryViews} from './viewCategory'
 import {Channel} from './store/channels'
 import {Team} from './store/teams'
 import {Subscription} from './wsclient'
@@ -1078,6 +1079,115 @@ class OctoClient {
 
     async unhideBoard(categoryID: string, boardID: string): Promise<Response> {
         const path = `${this.teamPath()}/categories/${categoryID}/boards/${boardID}/unhide`
+        return fetch(this.getBaseURL() + path, {
+            method: 'PUT',
+            headers: this.headers(),
+        })
+    }
+
+    // View Category APIs
+    async getViewCategoriesForBoard(boardID: string): Promise<ViewCategoryViews[]> {
+        const path = `/api/v2/boards/${boardID}/view-categories`
+        const response = await fetch(this.getBaseURL() + path, {headers: this.headers()})
+        if (response.status !== 200) {
+            return []
+        }
+
+        return (await this.getJson(response, [])) as ViewCategoryViews[]
+    }
+
+    async createViewCategory(boardID: string, category: ViewCategory): Promise<Response> {
+        const path = `/api/v2/boards/${boardID}/view-categories`
+        const body = JSON.stringify(category)
+        return fetch(this.getBaseURL() + path, {
+            method: 'POST',
+            headers: this.headers(),
+            body,
+        })
+    }
+
+    async deleteViewCategory(boardID: string, categoryID: string): Promise<Response> {
+        const url = `/api/v2/boards/${boardID}/view-categories/${categoryID}`
+        return fetch(this.getBaseURL() + url, {
+            method: 'DELETE',
+            headers: this.headers(),
+        })
+    }
+
+    async updateViewCategory(boardID: string, category: ViewCategory): Promise<Response> {
+        const path = `/api/v2/boards/${boardID}/view-categories/${category.id}`
+        const body = JSON.stringify(category)
+        return fetch(this.getBaseURL() + path, {
+            method: 'PUT',
+            headers: this.headers(),
+            body,
+        })
+    }
+
+    async reorderViewCategories(boardID: string, newCategoryOrder: string[]): Promise<string[]> {
+        const path = `/api/v2/boards/${boardID}/view-categories/reorder`
+        const body = JSON.stringify(newCategoryOrder)
+        const response = await fetch(this.getBaseURL() + path, {
+            method: 'PUT',
+            headers: this.headers(),
+            body,
+        })
+
+        if (response.status !== 200) {
+            return []
+        }
+
+        return (await this.getJson(response, [])) as string[]
+    }
+
+    async reorderViewCategoryViews(boardID: string, categoryID: string, newViewsOrder: string[]): Promise<string[]> {
+        const path = `/api/v2/boards/${boardID}/view-categories/${categoryID}/views/reorder`
+        const body = JSON.stringify(newViewsOrder)
+        const response = await fetch(this.getBaseURL() + path, {
+            method: 'PUT',
+            headers: this.headers(),
+            body,
+        })
+
+        if (response.status !== 200) {
+            return []
+        }
+
+        return (await this.getJson(response, [])) as string[]
+    }
+
+    async moveViewToCategory(boardID: string, viewID: string, toCategoryID: string): Promise<Response> {
+        const url = `/api/v2/boards/${boardID}/view-categories/${toCategoryID}/views/${viewID}`
+        const body = JSON.stringify({})
+
+        return fetch(this.getBaseURL() + url, {
+            method: 'POST',
+            headers: this.headers(),
+            body,
+        })
+    }
+
+    async uncategorizeView(boardID: string, viewID: string): Promise<Response> {
+        const url = `/api/v2/boards/${boardID}/views/${viewID}/uncategorize`
+        const body = JSON.stringify({})
+
+        return fetch(this.getBaseURL() + url, {
+            method: 'POST',
+            headers: this.headers(),
+            body,
+        })
+    }
+
+    async hideView(boardID: string, categoryID: string, viewID: string): Promise<Response> {
+        const path = `/api/v2/boards/${boardID}/view-categories/${categoryID}/views/${viewID}/hide`
+        return fetch(this.getBaseURL() + path, {
+            method: 'PUT',
+            headers: this.headers(),
+        })
+    }
+
+    async unhideView(boardID: string, categoryID: string, viewID: string): Promise<Response> {
+        const path = `/api/v2/boards/${boardID}/view-categories/${categoryID}/views/${viewID}/unhide`
         return fetch(this.getBaseURL() + path, {
             method: 'PUT',
             headers: this.headers(),

@@ -277,6 +277,10 @@ const Sidebar = (props: Props) => {
             handleCategoryDND(result)
         } else if (type === 'board') {
             handleCategoryBoardDND(result)
+        } else if (type === 'view-category') {
+            handleViewCategoryDND(result)
+        } else if (type === 'view') {
+            handleViewDND(result)
         } else {
             Utils.logWarn(`unknown drag type encountered, type: ${type}`)
         }
@@ -284,6 +288,50 @@ const Sidebar = (props: Props) => {
         setDraggedItemID('')
         setIsCategoryBeingDragged(false)
     }, [team, sidebarCategories])
+
+    const handleViewCategoryDND = useCallback(async (result: DropResult) => {
+        const {source, destination, draggableId} = result
+        if (!team || !destination) {
+            return
+        }
+
+        // Extract board ID from droppable ID: "board-{boardID}-categories"
+        const boardID = source.droppableId.replace('board-', '').replace('-categories', '')
+        
+        // Category IDs are prefixed with "category-"
+        const categoryId = draggableId.replace('category-', '')
+        
+        // Reordering categories - this would need to be handled by the board item component
+        // Since we don't have global state for view categories, we'll skip for now
+        Utils.logWarn('View category reordering not yet implemented at sidebar level')
+    }, [team])
+
+    const handleViewDND = useCallback(async (result: DropResult) => {
+        const {source, destination, draggableId} = result
+        if (!team || !destination) {
+            return
+        }
+
+        const fromDroppableId = source.droppableId
+        const toDroppableId = destination.droppableId
+        const viewID = draggableId.replace('view-', '')
+
+        // Extract category IDs from droppable IDs: "category-{categoryID}-views" or "uncategorized-views"
+        const getInfoFromDroppableId = (id: string) => {
+            if (id === 'uncategorized-views') {
+                return {categoryId: '', boardId: ''}
+            }
+            // Format: "category-{categoryID}-views"
+            const categoryId = id.replace('category-', '').replace('-views', '')
+            return {categoryId}
+        }
+
+        const fromInfo = getInfoFromDroppableId(fromDroppableId)
+        const toInfo = getInfoFromDroppableId(toDroppableId)
+
+        // This needs to be handled by the board item since it has access to the view categories state
+        Utils.logWarn('View drag-and-drop should be handled at board item level')
+    }, [team])
 
     const [draggedItemID, setDraggedItemID] = useState<string>('')
     const [isCategoryBeingDragged, setIsCategoryBeingDragged] = useState<boolean>(false)

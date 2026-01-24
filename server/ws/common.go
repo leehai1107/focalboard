@@ -72,3 +72,31 @@ type CategoryBoardReorderMessage struct {
 	BoardOrder []string `json:"BoardOrder"`
 	TeamID     string   `json:"teamId"`
 }
+
+type UpdateViewCategoryMessage struct {
+	Action       string               `json:"action"`
+	TeamID       string               `json:"teamId"`
+	ViewCategory *model.ViewCategory  `json:"viewCategory,omitempty"`
+}
+
+type ViewCategoryReorderMessage struct {
+	Action        string   `json:"action"`
+	CategoryOrder []string `json:"categoryOrder"`
+	TeamID        string   `json:"teamId"`
+	BoardID       string   `json:"boardId"`
+}
+
+type ViewCategoryViewUpdateMessage struct {
+	Action     string `json:"action"`
+	TeamID     string `json:"teamId"`
+	CategoryID string `json:"categoryId"`
+	ViewID     string `json:"viewId"`
+	Hidden     bool   `json:"hidden"`
+}
+
+type ViewCategoryViewsReorderMessage struct {
+	Action     string   `json:"action"`
+	CategoryID string   `json:"categoryId"`
+	ViewOrder  []string `json:"viewOrder"`
+	TeamID     string   `json:"teamId"`
+}

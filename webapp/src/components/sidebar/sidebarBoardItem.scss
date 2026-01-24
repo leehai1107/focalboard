@@ -183,3 +183,87 @@
         }
     }
 }
+
+.sidebar-view-tree {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 0;
+}
+
+.sidebar-view-category {
+    display: flex;
+    flex-direction: column;
+
+    .sidebar-view-category__header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        padding: 0 12px 0 28px;
+        height: 32px;
+        font-size: 12px;
+        font-weight: 600;
+        color: rgba(var(--sidebar-text-rgb), 0.56);
+        text-transform: uppercase;
+        cursor: pointer;
+
+        &:hover {
+            background-color: rgba(var(--sidebar-text-rgb), 0.08);
+
+            .MenuWrapper {
+                display: flex;
+            }
+        }
+
+        .sidebar-view-category__toggle {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            margin-left: -20px;
+            margin-right: 4px;
+
+            .Icon {
+                width: 16px;
+                height: 16px;
+            }
+        }
+
+        .MenuWrapper {
+            display: none;
+            margin-left: auto;
+
+            &.menuOpen {
+                display: flex;
+            }
+
+            .IconButton {
+                height: 24px;
+                width: 24px;
+                padding: 0;
+            }
+        }
+
+        .octo-sidebar-title {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .octo-sidebar-title-input {
+            background: rgba(var(--sidebar-text-rgb), 0.08);
+            border: 1px solid rgba(var(--sidebar-text-rgb), 0.16);
+            border-radius: 3px;
+            color: rgb(var(--sidebar-text-rgb));
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 6px;
+            outline: none;
+            flex: 1;
+            min-width: 0;
+
+            &:focus {
+                border-color: rgba(var(--sidebar-text-rgb), 0.4);
+                background: rgba(var(--sidebar-text-rgb), 0.12);
+            }
+        }
+    }
+}
