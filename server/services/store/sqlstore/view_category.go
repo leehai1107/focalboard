@@ -92,17 +92,17 @@ func (s *SQLStore) createViewCategory(db sq.BaseRunner, viewCategory model.ViewC
 		return err
 	}
 
-	// bumping up order of existing view categories
+	// bumping up order of existing view categories for this board (shared across users)
 	updateQuery := s.getQueryBuilder(db).
 		Update(s.tablePrefix+"view_categories").
 		Set("sort_order", sq.Expr(fmt.Sprintf("sort_order + %d", viewCategorySortOrderGap))).
 		Where(
 			sq.Eq{
-				"user_id":   viewCategory.UserID,
 				"board_id":  viewCategory.BoardID,
 				"delete_at": 0,
 			},
-		)
+		).
+		Where(sq.NotEq{"id": viewCategory.ID})
 
 	if _, err := updateQuery.Exec(); err != nil {
 		s.logger.Error(
@@ -154,12 +154,11 @@ func (s *SQLStore) deleteViewCategory(db sq.BaseRunner, categoryID, userID, boar
 	return nil
 }
 
-func (s *SQLStore) getUserViewCategories(db sq.BaseRunner, userID, boardID string) ([]model.ViewCategory, error) {
+func (s *SQLStore) getBoardViewCategories(db sq.BaseRunner, boardID string) ([]model.ViewCategory, error) {
 	query := s.getQueryBuilder(db).
 		Select(s.viewCategoryFields()...).
 		From(s.tablePrefix + "view_categories").
 		Where(sq.Eq{
-			"user_id":   userID,
 			"board_id":  boardID,
 			"delete_at": 0,
 		}).
@@ -167,11 +166,16 @@ func (s *SQLStore) getUserViewCategories(db sq.BaseRunner, userID, boardID strin
 
 	rows, err := query.Query()
 	if err != nil {
-		s.logger.Error("getUserViewCategories error fetching view categories", mlog.Err(err))
+		s.logger.Error("getBoardViewCategories error fetching view categories", mlog.Err(err))
 		return nil, err
 	}
 
 	return s.viewCategoriesFromRows(rows)
+}
+
+func (s *SQLStore) getUserViewCategories(db sq.BaseRunner, userID, boardID string) ([]model.ViewCategory, error) {
+	// Get all board categories (shared across users)
+	return s.getBoardViewCategories(db, boardID)
 }
 
 func (s *SQLStore) reorderViewCategories(db sq.BaseRunner, userID, boardID string, newCategoryOrder []string) ([]string, error) {
