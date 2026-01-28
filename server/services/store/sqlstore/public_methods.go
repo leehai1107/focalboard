@@ -1031,6 +1031,11 @@ func (s *SQLStore) UpdateUserPasswordByID(userID string, password string) error 
 
 }
 
+func (s *SQLStore) UpdateUserUsername(userID string, username string) error {
+	return s.updateUserUsername(s.db, userID, username)
+
+}
+
 func (s *SQLStore) UpsertNotificationHint(hint *model.NotificationHint, notificationFreq time.Duration) (*model.NotificationHint, error) {
 	return s.upsertNotificationHint(s.db, hint, notificationFreq)
 

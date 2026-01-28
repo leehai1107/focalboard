@@ -253,6 +253,7 @@
   "Sidebar.about": "About Focalboard",
   "Sidebar.add-board": "+ Add board",
   "Sidebar.changePassword": "Change password",
+  "Sidebar.changeUsername": "Change username",
   "Sidebar.delete-board": "Delete board",
   "Sidebar.duplicate-board": "Duplicate board",
   "Sidebar.export-archive": "Export archive",

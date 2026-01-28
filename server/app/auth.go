@@ -203,6 +203,42 @@ func (a *App) UpdateUserPassword(username, password string) error {
 	return nil
 }
 
+func (a *App) ChangeUsername(userID, password, newUsername string) error {
+	var user *model.User
+	if userID != "" {
+		var err error
+		user, err = a.store.GetUserByID(userID)
+		if err != nil {
+			return errors.Wrap(err, "invalid user")
+		}
+	}
+
+	if user == nil {
+		return errors.New("invalid user")
+	}
+
+	if !auth.ComparePassword(user.Password, password) {
+		a.logger.Debug("Invalid password for user", mlog.String("userID", user.ID))
+		return errors.New("invalid password")
+	}
+
+	// Check if username is already taken
+	existingUser, err := a.store.GetUserByUsername(newUsername)
+	if err != nil && !model.IsErrNotFound(err) {
+		return errors.Wrap(err, "unable to check username availability")
+	}
+	if existingUser != nil {
+		return errors.New("username already taken")
+	}
+
+	err = a.store.UpdateUserUsername(userID, newUsername)
+	if err != nil {
+		return errors.Wrap(err, "unable to update username")
+	}
+
+	return nil
+}
+
 func (a *App) ChangePassword(userID, oldPassword, newPassword string) error {
 	var user *model.User
 	if userID != "" {

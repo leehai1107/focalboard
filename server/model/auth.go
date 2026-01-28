@@ -104,6 +104,29 @@ func (rd *RegisterRequest) IsValid() error {
 	return isValidPassword(rd.Password)
 }
 
+// ChangeUsernameRequest is a user username change request
+// swagger:model
+type ChangeUsernameRequest struct {
+	// Current password (for verification)
+	// required: true
+	Password string `json:"password"`
+
+	// New username
+	// required: true
+	NewUsername string `json:"newUsername"`
+}
+
+// IsValid validates a username change request.
+func (rd *ChangeUsernameRequest) IsValid() error {
+	if rd.Password == "" {
+		return NewErrAuthParam("password is required")
+	}
+	if strings.TrimSpace(rd.NewUsername) == "" {
+		return NewErrAuthParam("new username is required")
+	}
+	return nil
+}
+
 // ChangePasswordRequest is a user password change request
 // swagger:model
 type ChangePasswordRequest struct {
