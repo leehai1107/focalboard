@@ -62,6 +62,13 @@ const SidebarUserMenu = () => {
                                 }}
                             />
                             <Menu.Text
+                                id='changeUsername'
+                                name={intl.formatMessage({id: 'Sidebar.changeUsername', defaultMessage: 'Change username'})}
+                                onClick={async () => {
+                                    history.push('/change_username')
+                                }}
+                            />
+                            <Menu.Text
                                 id='changePassword'
                                 name={intl.formatMessage({id: 'Sidebar.changePassword', defaultMessage: 'Change password'})}
                                 onClick={async () => {

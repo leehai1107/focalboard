@@ -13,6 +13,7 @@ import {createBrowserHistory, History} from 'history'
 
 import BoardPage from './pages/boardPage/boardPage'
 import ChangePasswordPage from './pages/changePasswordPage'
+import ChangeUsernamePage from './pages/changeUsernamePage'
 import ErrorPage from './pages/errorPage'
 import LoginPage from './pages/loginPage'
 import RegisterPage from './pages/registerPage'
@@ -89,6 +90,9 @@ const FocalboardRouter = (props: Props): JSX.Element => {
                 </FBRoute>
                 <FBRoute path='/register'>
                     <RegisterPage/>
+                </FBRoute>
+                <FBRoute path='/change_username'>
+                    <ChangeUsernamePage/>
                 </FBRoute>
                 <FBRoute path='/change_password'>
                     <ChangePasswordPage/>
